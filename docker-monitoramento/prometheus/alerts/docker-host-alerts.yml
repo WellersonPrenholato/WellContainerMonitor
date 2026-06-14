@@ -1,0 +1,38 @@
+groups:
+  - name: docker-host-alerts
+    rules:
+      - alert: ExporterDown
+        expr: up{job=~"cadvisor|node-exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Exporter fora do ar"
+          description: "O target {{ $labels.job }} em {{ $labels.instance }} esta indisponivel por mais de 2 minutos."
+
+      - alert: HostHighCPUUsage
+        expr: (100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU alta no host"
+          description: "Uso de CPU acima de 85% em {{ $labels.instance }} por 5 minutos."
+
+      - alert: HostHighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memoria alta no host"
+          description: "Uso de memoria acima de 90% em {{ $labels.instance }} por 5 minutos."
+
+      - alert: ContainerHighMemoryUsage
+        expr: ((container_memory_working_set_bytes{name!="", image!=""} / container_spec_memory_limit_bytes{name!="", image!=""}) * 100 > 90) and on (name, instance) (container_spec_memory_limit_bytes{name!="", image!=""} > 0)
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container com uso alto de memoria"
+          description: "Container {{ $labels.name }} usando mais de 90% do limite de memoria por 5 minutos."

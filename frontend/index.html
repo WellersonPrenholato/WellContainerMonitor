@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Well Container Monitor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fab fa-docker"></i>
+                <span>Well Container Monitor</span>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-gauge-high"></i> Dashboard
+                </button>
+                <button class="nav-item" data-page="containers">
+                    <i class="fas fa-cubes"></i> Containers
+                </button>
+                <button class="nav-item" data-page="logs">
+                    <i class="fas fa-file-lines"></i> Logs
+                </button>
+                <button class="nav-item" data-page="images">
+                    <i class="fas fa-layer-group"></i> Imagens
+                </button>
+                <button class="nav-item" data-page="metrics">
+                    <i class="fas fa-chart-line"></i> Métricas Históricas
+                </button>
+                <button class="nav-item" data-page="settings">
+                    <i class="fas fa-gear"></i> Configurações
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="conn-indicator" id="conn-indicator">
+                    <i class="fas fa-circle"></i> Conectando...
+                </span>
+            </div>
+        </aside>
+
+        <main class="main-area">
+            <header class="topbar">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="topbar-actions">
+                    <span class="last-update" id="last-update">Atualizando...</span>
+                    <button class="icon-btn" id="refresh-btn" title="Atualizar agora">
+                        <i class="fas fa-rotate"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Página: Dashboard -->
+            <section class="page active" id="page-dashboard">
+                <div class="summary-grid" id="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-icon icon-blue"><i class="fas fa-cubes"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-value" id="sum-total">-</span>
+                            <span class="summary-label">Containers totais</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon icon-green"><i class="fas fa-play"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-value" id="sum-running">-</span>
+                            <span class="summary-label">Ativos</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon icon-red"><i class="fas fa-stop"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-value" id="sum-stopped">-</span>
+                            <span class="summary-label">Parados</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon icon-green"><i class="fas fa-heart-pulse"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-value" id="sum-healthy">-</span>
+                            <span class="summary-label">Saudáveis</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon icon-red"><i class="fas fa-triangle-exclamation"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-value" id="sum-unhealthy">-</span>
+                            <span class="summary-label">Com problemas</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon icon-purple"><i class="fas fa-microchip"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-value" id="sum-cpu">-</span>
+                            <span class="summary-label">CPU total</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon icon-purple"><i class="fas fa-memory"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-value" id="sum-mem">-</span>
+                            <span class="summary-label">Memória total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Containers</h2>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="containers-table" id="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Nome</th>
+                                    <th>Imagem</th>
+                                    <th>CPU</th>
+                                    <th>Memória</th>
+                                    <th>Saúde</th>
+                                    <th>Uptime</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-table-body">
+                                <tr><td colspan="7" class="empty-row">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Página: Containers -->
+            <section class="page" id="page-containers">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="filter-name"><i class="fas fa-magnifying-glass"></i> Nome</label>
+                        <input type="text" id="filter-name" placeholder="Buscar por nome...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-image"><i class="fas fa-layer-group"></i> Imagem</label>
+                        <input type="text" id="filter-image" placeholder="Buscar por imagem...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-status"><i class="fas fa-circle-half-stroke"></i> Status</label>
+                        <select id="filter-status">
+                            <option value="">Todos</option>
+                            <option value="running">Running</option>
+                            <option value="exited">Exited</option>
+                            <option value="paused">Paused</option>
+                            <option value="restarting">Restarting</option>
+                            <option value="created">Created</option>
+                            <option value="dead">Dead</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-health"><i class="fas fa-heart-pulse"></i> Saúde</label>
+                        <select id="filter-health">
+                            <option value="">Todas</option>
+                            <option value="healthy">Healthy</option>
+                            <option value="unhealthy">Unhealthy</option>
+                            <option value="starting">Starting</option>
+                            <option value="none">Sem healthcheck</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="containers-layout">
+                    <div class="panel containers-list-panel">
+                        <div class="panel-header">
+                            <h2>Containers (<span id="containers-count">0</span>)</h2>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="containers-table" id="containers-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Nome</th>
+                                        <th>Imagem</th>
+                                        <th>Status</th>
+                                        <th>Saúde</th>
+                                        <th>Portas</th>
+                                        <th>Uptime</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="containers-table-body">
+                                    <tr><td colspan="8" class="empty-row">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <aside class="panel details-panel" id="details-panel">
+                        <div class="panel-header">
+                            <h2>Detalhes</h2>
+                        </div>
+                        <div class="details-content" id="details-content">
+                            <p class="empty-hint">Selecione um container na tabela para ver detalhes.</p>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- Página: Logs -->
+            <section class="page" id="page-logs">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Logs do container</h2>
+                        <div class="panel-actions">
+                            <select id="logs-container-select">
+                                <option value="">Selecione um container</option>
+                            </select>
+                            <select id="logs-tail-select">
+                                <option value="100">Últimas 100 linhas</option>
+                                <option value="200" selected>Últimas 200 linhas</option>
+                                <option value="500">Últimas 500 linhas</option>
+                                <option value="1000">Últimas 1000 linhas</option>
+                            </select>
+                            <button class="primary-btn" id="logs-refresh-btn"><i class="fas fa-rotate"></i> Atualizar</button>
+                        </div>
+                    </div>
+                    <pre class="logs-output" id="logs-output">Selecione um container para visualizar os logs.</pre>
+                </div>
+            </section>
+
+            <!-- Página: Imagens -->
+            <section class="page" id="page-images">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="filter-image-name"><i class="fas fa-magnifying-glass"></i> Nome</label>
+                        <input type="text" id="filter-image-name" placeholder="Buscar por nome/tag...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-image-usage"><i class="fas fa-circle-half-stroke"></i> Uso</label>
+                        <select id="filter-image-usage">
+                            <option value="">Todas</option>
+                            <option value="in-use">Em uso</option>
+                            <option value="unused">Não utilizadas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Imagens (<span id="images-count">0</span>)</h2>
+                        <div class="panel-actions">
+                            <button class="primary-btn" id="images-refresh-btn"><i class="fas fa-rotate"></i> Atualizar</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="containers-table" id="images-table">
+                            <thead>
+                                <tr>
+                                    <th>Repositório:Tag</th>
+                                    <th>ID</th>
+                                    <th>Tamanho</th>
+                                    <th>Criada em</th>
+                                    <th>Status</th>
+                                    <th>Usada por</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="images-table-body">
+                                <tr><td colspan="7" class="empty-row">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Página: Métricas Históricas -->
+            <section class="page" id="page-metrics">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Métricas Históricas (Grafana / Prometheus)</h2>
+                        <div class="panel-actions">
+                            <a class="secondary-btn" id="grafana-link" href="#" target="_blank" rel="noopener">
+                                <i class="fas fa-up-right-from-square"></i> Abrir Grafana
+                            </a>
+                            <a class="secondary-btn" id="prometheus-link" href="#" target="_blank" rel="noopener">
+                                <i class="fas fa-up-right-from-square"></i> Abrir Prometheus
+                            </a>
+                        </div>
+                    </div>
+                    <p class="settings-hint metrics-hint">
+                        O painel abaixo mostra o dashboard "Docker Services Overview" do Grafana,
+                        com histórico de CPU, memória, reinícios e status dos serviços.
+                    </p>
+                    <div class="metrics-iframe-wrap">
+                        <iframe id="grafana-iframe" class="metrics-iframe" title="Grafana - Docker Services Overview" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Página: Configurações -->
+            <section class="page" id="page-settings">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Configurações</h2>
+                    </div>
+                    <div class="settings-content">
+                        <div class="form-group">
+                            <label for="settings-api-url">Endereço da API</label>
+                            <input type="text" id="settings-api-url" placeholder="http://192.168.1.54:5050">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-refresh-interval">Intervalo de atualização (segundos)</label>
+                            <input type="number" id="settings-refresh-interval" min="1" step="1" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-grafana-url">Endereço do Grafana</label>
+                            <input type="text" id="settings-grafana-url" placeholder="http://192.168.1.54:3000">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-prometheus-url">Endereço do Prometheus</label>
+                            <input type="text" id="settings-prometheus-url" placeholder="http://192.168.1.54:9090">
+                        </div>
+                        <div class="form-actions">
+                            <button class="primary-btn" id="settings-save-btn"><i class="fas fa-floppy-disk"></i> Salvar</button>
+                        </div>
+                        <p class="settings-hint">As configurações são salvas localmente no navegador.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal: confirmação de ações destrutivas -->
+    <div class="modal-overlay hidden" id="confirm-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirmar ação</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Tem certeza?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-btn" id="confirm-cancel-btn">Cancelar</button>
+                <button class="danger-btn" id="confirm-ok-btn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: terminal do container -->
+    <div class="modal-overlay hidden" id="terminal-modal">
+        <div class="modal terminal-modal">
+            <div class="modal-header">
+                <h3 id="terminal-title">Terminal</h3>
+                <button class="icon-btn" id="terminal-close-btn" title="Fechar"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="terminal-body" id="terminal-body"></div>
+            <div class="terminal-status" id="terminal-status">Conectando...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

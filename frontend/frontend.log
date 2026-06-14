@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, 192.168.1.6 - - [14/Jun/2026 19:47:46] "GET / HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 19:47:46] "GET /css/style.css HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 19:47:46] "GET /js/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jun/2026 20:02:18] "GET /index.html HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:02:33] "GET / HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:03:23] "GET / HTTP/1.1" 304 -
+192.168.1.6 - - [14/Jun/2026 20:03:26] "GET / HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:03:26] "GET /css/style.css HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:03:26] "GET /js/app.js HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:03:27] code 404, message File not found
+192.168.1.6 - - [14/Jun/2026 20:03:27] "GET /favicon.ico HTTP/1.1" 404 -
+192.168.1.6 - - [14/Jun/2026 20:07:22] "GET / HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:07:23] "GET /css/style.css HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:07:23] "GET /js/app.js HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:07:23] code 404, message File not found
+192.168.1.6 - - [14/Jun/2026 20:07:23] "GET /favicon.ico HTTP/1.1" 404 -
+192.168.1.6 - - [14/Jun/2026 20:26:01] "GET / HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:26:02] "GET /css/style.css HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:26:02] "GET /js/app.js HTTP/1.1" 200 -
+192.168.1.6 - - [14/Jun/2026 20:26:02] code 404, message File not found
+192.168.1.6 - - [14/Jun/2026 20:26:02] "GET /favicon.ico HTTP/1.1" 404 -
