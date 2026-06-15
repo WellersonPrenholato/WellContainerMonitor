@@ -19,7 +19,7 @@ dados; para *histórico/tendências*, ele incorpora os dashboards do Grafana.
 ## Estrutura do projeto
 
 ```
-Monitoramento-geral/
+WellContainerMonitor/
 ├── backend/
 │   ├── app.py              # API REST + WebSocket (Flask + Flask-SocketIO)
 │   ├── docker_client.py     # Camada de acesso ao Docker (docker-py)
@@ -49,7 +49,7 @@ Monitoramento-geral/
 ### Instalação
 
 ```bash
-cd Monitoramento-geral/backend
+cd backend
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
@@ -65,7 +65,7 @@ python3 -m venv .venv
 ### Executar
 
 ```bash
-cd Monitoramento-geral/backend
+cd backend
 .venv/bin/python app.py
 ```
 
@@ -103,7 +103,7 @@ O frontend é estático (HTML/CSS/JS puro), basta servi-lo com qualquer servidor
 ### Executar (modo simples)
 
 ```bash
-cd Monitoramento-geral/frontend
+cd frontend
 python3 -m http.server 8088
 ```
 
@@ -194,11 +194,11 @@ cd docker-monitoramento
 docker compose up -d
 
 # Terminal 1 — backend do Well Container Monitor
-cd Monitoramento-geral/backend
+cd backend
 .venv/bin/python app.py
 
 # Terminal 2 — frontend do Well Container Monitor
-cd Monitoramento-geral/frontend
+cd frontend
 python3 -m http.server 8088
 ```
 
@@ -207,7 +207,7 @@ Depois, abra `http://<IP-DO-SERVIDOR>:8088` no navegador — esse é o **painel
 
 ## 6. Usando o Makefile
 
-Na raiz de `Monitoramento-geral/` há um `Makefile` com atalhos para todo o fluxo:
+Na raiz do projeto há um `Makefile` com atalhos para todo o fluxo:
 
 ```bash
 make install   # cria o venv e instala as dependencias do backend

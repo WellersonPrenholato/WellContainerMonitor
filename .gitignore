@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Logs e PIDs em runtime
+*.log
+*.pid
+
+# Dados do Grafana/Prometheus (volumes Docker, não versionados)
+docker-monitoramento/grafana_data/
+docker-monitoramento/prometheus_data/
